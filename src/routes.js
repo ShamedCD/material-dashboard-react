@@ -32,6 +32,7 @@ import Typography from "views/Typography/Typography.js";
 import Icons from "views/Icons/Icons.js";
 import Maps from "views/Maps/Maps.js";
 import NotificationsPage from "views/Notifications/Notifications.js";
+import TestPage from "views/Pruebas/Test.js";
 import UpgradeToPro from "views/UpgradeToPro/UpgradeToPro.js";
 // core components/views for RTL layout
 import RTLPage from "views/RTLPage/RTLPage.js";
@@ -91,6 +92,14 @@ const dashboardRoutes = [
     rtlName: "إخطارات",
     icon: Notifications,
     component: NotificationsPage,
+    layout: "/admin"
+  },
+  {
+    path: "/tests",
+    name: "Pruebas",
+    rtlName: "إخطارات",
+    icon: Notifications,
+    component: TestPage,
     layout: "/admin"
   },
   {
