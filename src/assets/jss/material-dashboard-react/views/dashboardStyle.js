@@ -2,12 +2,16 @@ import {
   successColor,
   whiteColor,
   grayColor,
-  hexToRgb
+  hexToRgb,
 } from "assets/jss/material-dashboard-react.js";
 
 const dashboardStyle = {
   successText: {
     color: successColor[0]
+  },
+  downloadButton: {
+    verticalAlign: "middle",
+    alingn: "right",
   },
   upArrowCardCategory: {
     width: "16px",

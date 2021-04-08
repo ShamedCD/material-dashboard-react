@@ -6,6 +6,7 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
 import Typography from "@material-ui/core/Typography";
+import defaultImage from "../../assets/img/domain/supply/default-thumbnail.jpg";
 
 const useStyles = makeStyles({
   root: {
@@ -24,6 +25,7 @@ export default function InventoryCard(props) {
     body_code,
     remaining_units,
     available_units,
+    image,
   } = attribute;
 
   const RequestButton = param?.request_button;
@@ -34,10 +36,10 @@ export default function InventoryCard(props) {
       <CardActionArea>
         <CardMedia
           component="img"
-          alt="Contemplative Reptile"
+          alt={title}
           height="140"
-          image="https://http2.mlstatic.com/D_NQ_NP_811699-MLM42726283416_072020-O.webp"
-          title="Contemplative Reptile"
+          image={image ? image : defaultImage}
+          title={title}
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">

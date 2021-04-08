@@ -5,9 +5,11 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 
 export default function ComboBox({ attributes, behaviour, handleChange }) {
   //   const [opts, setOpts] = useState({});
-  const { id, text } = attributes;
+  const { id, text, style } = attributes;
   const { response, key } = behaviour;
   const { handleOptions, handleItem } = handleChange;
+  const realStyle = style ? style : { width: "100%" };
+
   return (
     <Autocomplete
       id={id}
@@ -16,7 +18,7 @@ export default function ComboBox({ attributes, behaviour, handleChange }) {
         const result = option ? option[key] : "";
         return result;
       }}
-      style={{ width: "100%" }}
+      style={realStyle}
       renderInput={(params) => (
         <TextField {...params} label={text} variant="outlined" />
       )}

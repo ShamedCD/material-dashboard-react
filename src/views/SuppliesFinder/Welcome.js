@@ -17,33 +17,38 @@ import Selector from "components/Autocomplete/Selector";
 const opts = [
   {
     id: 1,
-    name: "The Shawshank",
+    name: "Jeringa",
     code: "1994-1121-2021-2102",
-    label: "1994-1121-2021-2102: The Shawshank Redemption",
+    label: "1994-1121-2021-2102: Jeringa",
+    image: "https://www.jeringasyagujas.com/72-large_default/jeringas-de-5-ml-con-aguja-g21-de-08-mm-x-40.jpg",
   },
   {
     id: 2,
-    name: "The Godfather",
+    name: "Guantes de latex",
     code: "1972-1121-2021-2103",
-    label: "1972-1121-2021-2103: The Godfather",
+    label: "1972-1121-2021-2103: Guantes de latex",
+    image: "https://images-na.ssl-images-amazon.com/images/I/51X6FbyYCKL._AC_SY450_PIbundle-100,TopRight,0,0_SH20_.jpg",
   },
   {
     id: 3,
-    name: "The Godfather: Part II",
+    name: "Electrocardiograma",
     code: "1974-1121-2021-2104",
-    label: "1974-1121-2021-2104: The Godfather: Part II",
+    label: "1974-1121-2021-2104: Electrocardiograma",
+    image: "https://st.depositphotos.com/1616496/2602/i/950/depositphotos_26025909-stock-photo-defibrillator.jpg",
   },
   {
     id: 4,
-    name: "The Dark Knight",
+    name: "Cable de monitor de signos vitales",
     code: "2008-1121-2021-2105",
-    label: "1974-1121-2021-2105: The Dark Knight",
+    label: "1974-1121-2021-2105: Cable de monitor de signos vitales",
+    image: "https://img.medicalexpo.es/images_me/photo-m2/76060-4057747.jpg",
   },
   {
     id: 5,
-    name: "12 Angry Men",
+    name: "Paracetamol",
     code: "1957-1121-2021-2106",
-    label: "1974-1121-2021-2106: 12 Angry Men",
+    label: "1974-1121-2021-2106: Paracetamol",
+    image: "https://s1.eestatic.com/2016/03/19/actualidad/actualidad_110751227_129370730_1706x960.jpg",
   },
 ];
 
@@ -240,6 +245,7 @@ export default function Login() {
                         body_model: "NS",
                         body_code: code,
                         available_units: 5,
+                        image: item?.image,
                       }}
                       param={{
                         request_button: () => RequestButton,

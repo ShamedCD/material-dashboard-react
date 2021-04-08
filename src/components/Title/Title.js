@@ -1,9 +1,9 @@
 import { Typography } from "@material-ui/core";
 import React from "react";
 
-const Title = ({ text }) => {
+const Title = ({ text, className }) => {
   return (
-    <Typography component="h1" variant="h5">
+    <Typography className={className} component="h1" variant="h5">
       {text}
     </Typography>
   );

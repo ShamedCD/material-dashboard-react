@@ -5,7 +5,7 @@ import React from "react";
 const Copyright = () => {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
-      {"Copyright © "}
+      {"Copyright "}&copy;{" "}
       <Link color="inherit" href="#">
         IMSS
       </Link>{" "}

@@ -22,10 +22,14 @@ import LibraryBooks from "@material-ui/icons/LibraryBooks";
 import BubbleChart from "@material-ui/icons/BubbleChart";
 import LocationOn from "@material-ui/icons/LocationOn";
 import Notifications from "@material-ui/icons/Notifications";
+import SettingsApplicationsIcon from "@material-ui/icons/SettingsApplications";
+import PriorityHighIcon from "@material-ui/icons/PriorityHigh";
+import AddBoxIcon from "@material-ui/icons/AddBox";
 import Search from "@material-ui/icons/Search";
 import Unarchive from "@material-ui/icons/Unarchive";
 import Language from "@material-ui/icons/Language";
 // core components/views for Admin layout
+import DashboardPage2 from "views/Dashboard/Dashboard-copy.js";
 import DashboardPage from "views/Dashboard/Dashboard.js";
 import UserProfile from "views/UserProfile/UserProfile.js";
 import TableList from "views/TableList/TableList.js";
@@ -35,6 +39,9 @@ import Maps from "views/Maps/Maps.js";
 import NotificationsPage from "views/Notifications/Notifications.js";
 import TestPage from "views/Pruebas/Test.js";
 import WelcomePage from "views/SuppliesFinder/Welcome.js";
+import ManageSupplyRecordsPage from "views/Inventory/ManageSupplyRecords.js";
+import RegisterNewEntryPage from "views/Inventory/RegisterNewEntry.js";
+import ProductsLowStockPage from "views/Inventory/ProductsLowStock.js";
 import UpgradeToPro from "views/UpgradeToPro/UpgradeToPro.js";
 // core components/views for RTL layout
 import RTLPage from "views/RTLPage/RTLPage.js";
@@ -43,18 +50,50 @@ const dashboardRoutes = [
   {
     path: "/find-supplies",
     name: "Inicio",
-    rtlName: "إخطارات",
+    rtlName: "inicio",
     icon: Search,
     component: WelcomePage,
-    layout: "/admin"
+    layout: "/admin",
   },
+  {
+    path: "/manage-records",
+    name: "Gestionar Registros",
+    rtlName: "Gestionar Registros",
+    icon: SettingsApplicationsIcon,
+    component: ManageSupplyRecordsPage,
+    layout: "/admin",
+  },
+  {
+    path: "/new-entry",
+    name: "Nueva Entrada",
+    rtlName: "Nueva Entrada",
+    icon: AddBoxIcon,
+    component: RegisterNewEntryPage,
+    layout: "/admin",
+  },
+  {
+    path: "/low-stock",
+    name: "Baja existencia",
+    rtlName: "Baja existencia",
+    icon: PriorityHighIcon,
+    component: ProductsLowStockPage,
+    layout: "/admin",
+  },
+  // {
+  //   path: "/dashboard2",
+  //   name: "Dashboard",
+  //   rtlName: "لوحة القيادة",
+  //   icon: Dashboard,
+  //   component: DashboardPage2,
+  //   layout: "/admin"
+  // },
   {
     path: "/dashboard",
     name: "Dashboard",
-    rtlName: "لوحة القيادة",
+    rtlName: "Tablero",
     icon: Dashboard,
     component: DashboardPage,
-    layout: "/admin"
+    layout: "/admin",
   },
   // {
   //   path: "/user",
@@ -104,14 +143,14 @@ const dashboardRoutes = [
   //   component: NotificationsPage,
   //   layout: "/admin"
   // },
-  {
-    path: "/tests",
-    name: "Pruebas",
-    rtlName: "إخطارات",
-    icon: Notifications,
-    component: TestPage,
-    layout: "/admin"
-  },
+  // {
+  //   path: "/tests",
+  //   name: "Pruebas",
+  //   rtlName: "إخطارات",
+  //   icon: Notifications,
+  //   component: TestPage,
+  //   layout: "/admin"
+  // },
   // {
   //   path: "/rtl-page",
   //   name: "RTL Support",
