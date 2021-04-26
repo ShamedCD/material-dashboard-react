@@ -22,6 +22,7 @@ import { Router, Route, Switch, Redirect } from "react-router-dom";
 
 // core components
 import Inventory from "layouts/Inventory.js";
+import Infirmary from "layouts/Infirmary.js";
 import RTL from "layouts/RTL.js";
 
 import "assets/css/material-dashboard-react.css?v=1.9.0";
@@ -32,6 +33,7 @@ ReactDOM.render(
   <Router history={hist}>
     <Switch>
       <Route path="/admin" component={Inventory} />
+      <Route path="/infirmary" component={Infirmary} />
       <Route path="/rtl" component={RTL} />
       <Redirect from="/" to="/admin/dashboard" />
     </Switch>
