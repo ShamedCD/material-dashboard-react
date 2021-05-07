@@ -84,7 +84,7 @@ export default function NewRequestPreview({ attributes, dataset }) {
             <p>Folio: </p>
             <p>Delegacion: </p>
             <p>Unidad Medica: </p>
-            <p>Sercicio: </p>
+            <p>Servicio: </p>
             <p>Fecha de suministro: </p>
           </GridItem>
           <GridItem xs={12} sm={12} md={12}>
