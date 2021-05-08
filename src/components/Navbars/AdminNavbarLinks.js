@@ -20,10 +20,12 @@ import CustomInput from "components/CustomInput/CustomInput.js";
 import Button from "components/CustomButtons/Button.js";
 
 import styles from "assets/jss/material-dashboard-react/components/headerLinksStyle.js";
+import useToken from "components/App/useToken";
 
 const useStyles = makeStyles(styles);
 
 export default function AdminNavbarLinks() {
+  const { setToken } = useToken();
   const classes = useStyles();
   const [openNotification, setOpenNotification] = React.useState(null);
   const [openProfile, setOpenProfile] = React.useState(null);
@@ -45,7 +47,9 @@ export default function AdminNavbarLinks() {
     }
   };
   const handleCloseProfile = () => {
-    setOpenProfile(null);
+    // setOpenProfile(null);
+    setToken('');
+    window.location.reload();
   };
   return (
     <div>

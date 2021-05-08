@@ -28,23 +28,39 @@ import Infirmary from "layouts/Infirmary.js";
 import RTL from "layouts/RTL.js";
 
 import "assets/css/material-dashboard-react.css?v=1.9.0";
+import Login from "views/Login/Login";
+import useToken from "./components/App/useToken";
 
 const hist = createBrowserHistory();
 const client = new ApolloClient({
+  // uri: "http://18.220.254.104:8050/",
   uri: process.env.API_GATEWAY_URL,
   cache: new InMemoryCache(),
 });
 
-ReactDOM.render(
-  <ApolloProvider client={client}>
-    <Router history={hist}>
-      <Switch>
-        <Route path="/admin" component={Inventory} />
-        <Route path="/infirmary" component={Infirmary} />
-        <Route path="/rtl" component={RTL} />
-        <Redirect from="/" to="/admin/dashboard" />
-      </Switch>
-    </Router>
-  </ApolloProvider>,
-  document.getElementById("root")
-);
+function App() {
+  const { token, setToken } = useToken();
+
+  if (!token) {
+    return (
+      <ApolloProvider client={client}>
+        <Login setToken={setToken} />
+      </ApolloProvider>
+    );
+  }
+
+  return (
+    <ApolloProvider client={client}>
+      <Router history={hist}>
+        <Switch>
+          <Route path="/admin" component={Inventory} />
+          <Route path="/infirmary" component={Infirmary} />
+          <Route path="/rtl" component={RTL} />
+          <Redirect from="/" to="/admin/dashboard" />
+        </Switch>
+      </Router>
+    </ApolloProvider>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById("root"));

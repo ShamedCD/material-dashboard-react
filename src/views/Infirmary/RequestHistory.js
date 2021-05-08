@@ -71,7 +71,7 @@ function findRequestByKey(key) {
   return {
     id: 1,
     reqType: "vale",
-    status: "Solicitud Recibida",
+    status: "Recepción de Insumo",
     items: [
       {
         id: "1",

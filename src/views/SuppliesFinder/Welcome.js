@@ -85,7 +85,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Login() {
+export default function Welcome() {
   const [catgOpts, setCatgOpts] = useState(opts);
   const [haveLastSearch, setHaveLastSearch] = useState(false);
 

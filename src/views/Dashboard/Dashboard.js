@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useQuery } from "@apollo/client";
 // react plugin for creating charts
 import ChartistGraph from "react-chartist";
 // @material-ui/core
@@ -12,6 +13,7 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
+import AccountQueries from "queries/Account.js";
 
 import {
   topSuppliesChart,
@@ -26,6 +28,25 @@ import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js"
 import ComboBox from "components/Autocomplete/ComboBox";
 import Selector from "components/Autocomplete/Selector";
 import DatePicker from "components/Autocomplete/DatePicker";
+
+function UserInfo() {
+  const { loading, error, data } = useQuery(AccountQueries.loginAccount, {
+    variables: { card: "123456789", password: "123456", address: "imss.gob7" },
+  });
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error : {error}</p>;
+
+  const { loginAccount } = data;
+
+  return (
+    <div key={loginAccount.uuid}>
+      <p>
+        {loginAccount.name} {loginAccount.paternal} {loginAccount.maternal}
+      </p>
+    </div>
+  );
+}
 
 const useStyles = makeStyles(styles);
 
@@ -71,18 +92,18 @@ function initializeTopSupplies(filters = {}) {
       ],
     ],
     labels: [
-      "Jan",
+      "Ene",
       "Feb",
       "Mar",
-      "Apr",
-      "Mai",
+      "Abr",
+      "May",
       "Jun",
       "Jul",
-      "Aug",
+      "Ago",
       "Sep",
       "Oct",
       "Nov",
-      "Dec",
+      "Dic",
     ],
   };
 }
@@ -115,18 +136,18 @@ function initializePurchasesByService(filters = {}) {
 function initializePurchaseByMonth(filters = {}) {
   return {
     labels: [
-      "Jan",
+      "Ene",
       "Feb",
       "Mar",
-      "Apr",
-      "Mai",
+      "Abr",
+      "May",
       "Jun",
       "Jul",
-      "Aug",
+      "Ago",
       "Sep",
       "Oct",
       "Nov",
-      "Dec",
+      "Dic",
     ],
     series: [
       [
@@ -264,6 +285,7 @@ export default function Dashboard() {
 
   return (
     <div>
+      {/* <UserInfo /> */}
       <GridContainer>
         <GridItem xs={12} sm={12} md={6}>
           <Card chart>
