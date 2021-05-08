@@ -15,6 +15,7 @@ import Input from "components/CustomInput/Input.js";
 import { AccountCircle, Lock } from "@material-ui/icons";
 import PropTypes from "prop-types";
 import { useQuery } from "@apollo/client";
+import Alert from "@material-ui/lab/Alert";
 import AccountQueries from "queries/Account.js";
 
 const useStyles = makeStyles((theme) => ({
@@ -46,6 +47,9 @@ export default function Login({ setToken }) {
   const [username, setUserName] = useState();
   const [password, setPassword] = useState();
   const [tryLog, setTryLog] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertType, setAlertType] = useState();
+  const [alertMsg, setAlertMsg] = useState();
 
   function LoginUser({ card, password }) {
     const { loading, error, data } = useQuery(AccountQueries.loginAccount, {
@@ -54,18 +58,29 @@ export default function Login({ setToken }) {
     });
 
     // agregar loader
-    if (loading) return <p>Loading...</p>;
+    if (loading) {
+      setAlertType("info");
+      setAlertMsg("Cargando...");
+      setShowAlert(true);
+      return <p></p>;
+    }
 
     // Mostrar mensaje de error, disparar un flag que lo muestre
     if (error) {
+      setAlertType("error");
+      setAlertMsg("Error: El usuario o contraseña ingresados son incorrectos.");
+      setShowAlert(true);
       setTryLog(false);
       // Primero mostrar flag
-      return <p>Error: El usuario o contraseña ingresados son incorrectos. </p>;
+      return <p></p>;
     }
 
     const { loginAccount } = data;
     // Tal vez sin return y que muestre un mensaje antes de setear el token
     setToken(loginAccount.uuid);
+    setAlertType("success");
+    setAlertMsg(`¡Bienvenido ${loginAccount.name}!`);
+    setShowAlert(true);
     setTryLog(false);
     window.location.reload();
     return <p>Bienvenido!</p>;
@@ -79,6 +94,7 @@ export default function Login({ setToken }) {
     //   password,
     // });
     // setToken(token);
+    setShowAlert(false);
     setTryLog(true);
 
     // if (loading) return <p>Loading...</p>;
@@ -97,6 +113,7 @@ export default function Login({ setToken }) {
       <div className={classes.paper}>
         <Logo />
         <Title text="Ingresa al Sistema de Abasto" />
+        {showAlert && <Alert severity={alertType}>{alertMsg}</Alert>}
         <form className={classes.form} noValidate onSubmit={handleSubmit}>
           <Input
             attribute={{
