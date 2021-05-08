@@ -33,8 +33,8 @@ import useToken from "./components/App/useToken";
 
 const hist = createBrowserHistory();
 const client = new ApolloClient({
-  // uri: "http://18.220.254.104:8050/",
-  uri: process.env.API_GATEWAY_URL,
+  uri: "http://18.220.254.104:8050/",
+  // uri: process.env.API_GATEWAY_URL,
   cache: new InMemoryCache(),
 });
 

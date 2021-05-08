@@ -54,7 +54,7 @@ export default function Login({ setToken }) {
   function LoginUser({ card, password }) {
     const { loading, error, data } = useQuery(AccountQueries.loginAccount, {
       // variables: { card: "123456789", password: "123456", address: "imss.gob7" },
-      variables: { card: card, password: password, address: "imss.gob7" },
+      variables: { card: card, password: password },
     });
 
     // agregar loader
