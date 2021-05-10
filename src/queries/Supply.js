@@ -8,37 +8,39 @@ export default {
       $esp: String!
       $dif: String!
       $var: String!
-      $cbi: String!
+      $cbi: Float!
       $descripcion: String!
       $unidadPresentacion: String!
-      $cantidadPresentacion: String!
+      $cantidadPresentacion: Float!
       $tipoPresentacion: String!
-      $precioArticulo: String!
-      $partidaPresupuestal: String!
-      $inventariables: String!
-      $nivelCompra: String!
+      $precioArticulo: Float!
+      $partidaPresupuestal: Float!
+      $inventariables: Float!
+      $nivelCompra: Float!
       $linea: String!
       $registro: String!
-      $createdAt: String!
+      $createdAt: DateTime!
     ) {
       createSupply(
-        gpo: $gpo
-        gen: $gen
-        esp: $esp
-        dif: $dif
-        var: $var
-        cbi: $cbi
-        descripcion: $descripcion
-        unidadPresentacion: $unidadPresentacion
-        cantidadPresentacion: $cantidadPresentacion
-        tipoPresentacion: $tipoPresentacion
-        precioArticulo: $precioArticulo
-        partidaPresupuestal: $partidaPresupuestal
-        inventariables: $inventariables
-        nivelCompra: $nivelCompra
-        linea: $linea
-        registro: $registro
-        createdAt: $createdAt
+        input: {
+          gpo: $gpo
+          gen: $gen
+          esp: $esp
+          dif: $dif
+          var: $var
+          cbi: $cbi
+          descripcion: $descripcion
+          unidadPresentacion: $unidadPresentacion
+          cantidadPresentacion: $cantidadPresentacion
+          tipoPresentacion: $tipoPresentacion
+          precioArticulo: $precioArticulo
+          partidaPresupuestal: $partidaPresupuestal
+          inventariables: $inventariables
+          nivelCompra: $nivelCompra
+          linea: $linea
+          registro: $registro
+          createdAt: $createdAt
+        }
       )
     }
   `,
@@ -75,19 +77,6 @@ export default {
       }
     }
   `,
-  // searchSupplies: gql`
-  //   query SearchSupplies {
-  //     searchSupplies {
-  //       items {
-  //         id
-  //         name
-  //         code
-  //         label
-  //       }
-  //       count
-  //     }
-  //   }
-  // `,
   fetchSupplies: gql`
     query FetchSupplies($take: Float, $skip: Float, $status: String) {
       fetchSupplies(take: $take, skip: $skip, status: $status) {
@@ -101,6 +90,7 @@ export default {
           descripcion
           status
           qty
+          cpm
           unidadPresentacion
           cantidadPresentacion
           tipoPresentacion
@@ -110,40 +100,12 @@ export default {
           nivelCompra
           linea
           registro
+          createdAt
         }
         count
       }
     }
   `,
-  // fetchSupplies: gql`
-  //   query FetchSupplies($take: Float, $skip: Float, $status: String) {
-  //     fetchSupplies(take: $take, skip: $skip, status: $status) {
-  //       items {
-  //         gpo
-  //         gen
-  //         esp
-  //         dif
-  //         var
-  //         cbi
-  //         descripcion
-  //         status
-  //         qty
-  //         cpm
-  //         unidadPresentacion
-  //         cantidadPresentacion
-  //         tipoPresentacion
-  //         precioArticulo
-  //         partidaPresupuestal
-  //         inventariables
-  //         nivelCompra
-  //         linea
-  //         registro
-  //         createdAt
-  //       }
-  //       count
-  //     }
-  //   }
-  // `,
   getSupply: gql`
     query GetSupply($id: ID!) {
       getSupply(id: $id) {

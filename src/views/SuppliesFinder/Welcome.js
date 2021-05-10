@@ -238,7 +238,7 @@ export default function Welcome() {
                         body_device: "",
                         body_model: "",
                         body_code: code,
-                        available_units: item.qty ?? "0",
+                        available_units: item?.qty ?? "0",
                         image: item?.image,
                       }}
                       param={{

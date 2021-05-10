@@ -68,7 +68,7 @@ export default function RegisterNewEntry() {
       setShowError(false);
       try {
         await registerEntry({
-          variables: { id: itemSelected.id, qty: newQty },
+          variables: { id: itemSelected.id, qty: parseInt(newQty) },
         });
         setNewQty(0);
         // refetchUsers()
@@ -123,7 +123,6 @@ export default function RegisterNewEntry() {
       id="outlined-number"
       label="Cantidad"
       type="number"
-      inputRef={newQty}
       InputLabelProps={{
         shrink: true,
       }}
@@ -140,6 +139,7 @@ export default function RegisterNewEntry() {
       size="small"
       color="primary"
       onClick={registerNewEntry}
+      disabled={mutationLoading}
     >
       Agregar
     </Button>
@@ -226,7 +226,7 @@ export default function RegisterNewEntry() {
             Error: Intente de nuevo mas tarde o contacte al administrador.
           </Alert>
         )}
-        {mutationData && <Alert severity="success">¡Operación exitosa!.</Alert>}
+        {mutationData && <Alert severity="success">¡Operación exitosa!</Alert>}
       </div>
     </Container>
   );

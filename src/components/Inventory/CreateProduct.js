@@ -2,22 +2,20 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListItem from "@material-ui/core/ListItem";
-import List from "@material-ui/core/List";
-import Divider from "@material-ui/core/Divider";
+import { useMutation } from "@apollo/client";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import CloseIcon from "@material-ui/icons/Close";
 import { Form, Field } from "react-final-form";
-import { Grid, Paper } from "@material-ui/core";
-import { TextField, Checkbox, Radio, Select } from "final-form-material-ui";
+import { Backdrop, CircularProgress, Grid, Paper } from "@material-ui/core";
+import { TextField } from "final-form-material-ui";
 import GridContainer from "components/Grid/GridContainer";
 import GridItem from "components/Grid/GridItem";
 import InputAdornment from "@material-ui/core/InputAdornment";
-import { Link } from "react-router-dom";
+import SupplyQueries from "queries/Supply.js";
+import Alert from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -32,30 +30,70 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 15,
     color: "green",
   },
+  buttons: {
+    "& > *": {
+      margin: theme.spacing(1),
+    },
+    textAlign: "right",
+  },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: "#fff",
+  },
 }));
 
-const onSubmit = async (values) => {
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  await sleep(300);
-  window.alert(JSON.stringify(values, 0, 2));
-};
 const validate = (values) => {
-  const errors = {};
-  if (!values.firstName) {
-    errors.firstName = "Required";
-  }
-  if (!values.lastName) {
-    errors.lastName = "Required";
-  }
-  if (!values.email) {
-    errors.email = "Required";
-  }
-  return errors;
+  // Agregar validacion de campos requeridos y mostrar respectivo mensaje.
+  // const errors = {};
+  // if (!values.firstName) {
+  //   errors.firstName = "Required";
+  // }
+  // if (!values.lastName) {
+  //   errors.lastName = "Required";
+  // }
+  // if (!values.email) {
+  //   errors.email = "Required";
+  // }
+  // return errors;
 };
 
 export default function CreateProduct({ attributes, handleClose }) {
   const classes = useStyles();
-  const { title, open, Transition } = attributes;
+  const { title, open, initialValues, Transition } = attributes;
+
+  const [
+    addProduct,
+    { loading: mutationLoading, error: mutationError, data: mutationData },
+  ] = useMutation(SupplyQueries.createSupply);
+
+  const onSubmit = async (values) => {
+    try {
+      await addProduct({
+        variables: {
+          gpo: values.gpo,
+          gen: values.gen,
+          esp: values.esp,
+          dif: values.dif,
+          var: values.var,
+          cbi: parseInt(values.cbi),
+          descripcion: `${values.name} - ${values.make} - ${values.model}`,
+          unidadPresentacion: values.unidadPresentacion,
+          cantidadPresentacion: parseInt(values.cantidadPresentacion),
+          tipoPresentacion: values.tipoPresentacion,
+          precioArticulo: parseInt(values.precioArticulo),
+          partidaPresupuestal: parseInt(values.partidaPresupuestal),
+          inventariables: parseInt(values.inventariables),
+          nivelCompra: parseInt(values.nivelCompra),
+          linea: values.linea,
+          registro: values.registro,
+          createdAt: values.createdAt,
+        },
+      });
+      window.location.reload();
+    } catch (e) {
+      console.info(e.message);
+    }
+  };
 
   return (
     <Dialog
@@ -77,14 +115,19 @@ export default function CreateProduct({ attributes, handleClose }) {
           <Typography variant="h6" className={classes.title}>
             {title}
           </Typography>
-          <Button autoFocus color="inherit" onClick={handleClose}>
+          {/* <Button autoFocus color="inherit" type="submit">
             Guardar
-          </Button>
+          </Button> */}
         </Toolbar>
       </AppBar>
+      {mutationError && (
+        <Alert severity="error">
+          Ha ocurrido un error, intente de nuevo mas tarde.
+        </Alert>
+      )}
       <Form
         onSubmit={onSubmit}
-        initialValues={{ employed: true, stooge: "larry" }}
+        initialValues={initialValues ?? {}}
         validate={validate}
         render={({ handleSubmit, reset, submitting, pristine, values }) => (
           <form onSubmit={handleSubmit} noValidate>
@@ -101,7 +144,7 @@ export default function CreateProduct({ attributes, handleClose }) {
                   <Field
                     fullWidth
                     required
-                    name="group"
+                    name="gpo"
                     component={TextField}
                     type="text"
                     label="Grupo"
@@ -113,7 +156,7 @@ export default function CreateProduct({ attributes, handleClose }) {
                   <Field
                     fullWidth
                     required
-                    name="general"
+                    name="gen"
                     component={TextField}
                     type="text"
                     label="General"
@@ -125,7 +168,7 @@ export default function CreateProduct({ attributes, handleClose }) {
                   <Field
                     fullWidth
                     required
-                    name="specification"
+                    name="esp"
                     component={TextField}
                     type="text"
                     label="Especificación"
@@ -137,7 +180,7 @@ export default function CreateProduct({ attributes, handleClose }) {
                   <Field
                     fullWidth
                     required
-                    name="differentiator"
+                    name="dif"
                     component={TextField}
                     type="text"
                     label="Diferenciador"
@@ -149,7 +192,7 @@ export default function CreateProduct({ attributes, handleClose }) {
                   <Field
                     fullWidth
                     required
-                    name="variant"
+                    name="var"
                     component={TextField}
                     type="text"
                     label="Variante"
@@ -163,7 +206,7 @@ export default function CreateProduct({ attributes, handleClose }) {
                     required
                     name="cbi"
                     component={TextField}
-                    type="text"
+                    type="number"
                     label="CBI"
                     size="small"
                     variant="outlined"
@@ -193,7 +236,7 @@ export default function CreateProduct({ attributes, handleClose }) {
                 <GridItem xs={12} sm={6}>
                   <Field
                     fullWidth
-                    required
+                    // required
                     name="catgProvider"
                     component={TextField}
                     type="text"
@@ -229,7 +272,7 @@ export default function CreateProduct({ attributes, handleClose }) {
                 <GridItem xs={12} sm={6}>
                   <Field
                     fullWidth
-                    required
+                    // required
                     name="affiliateTo"
                     component={TextField}
                     type="text"
@@ -251,7 +294,7 @@ export default function CreateProduct({ attributes, handleClose }) {
                   <Field
                     fullWidth
                     required
-                    name="unit"
+                    name="unidadPresentacion"
                     component={TextField}
                     type="text"
                     label="Unidad"
@@ -263,9 +306,9 @@ export default function CreateProduct({ attributes, handleClose }) {
                   <Field
                     fullWidth
                     required
-                    name="quantity"
+                    name="cantidadPresentacion"
                     component={TextField}
-                    type="text"
+                    type="number"
                     label="Cantidad"
                     size="small"
                     variant="outlined"
@@ -275,7 +318,7 @@ export default function CreateProduct({ attributes, handleClose }) {
                   <Field
                     fullWidth
                     required
-                    name="type"
+                    name="tipoPresentacion"
                     component={TextField}
                     type="text"
                     label="Tipo"
@@ -296,9 +339,9 @@ export default function CreateProduct({ attributes, handleClose }) {
                   <Field
                     fullWidth
                     required
-                    name="amount"
+                    name="precioArticulo"
                     component={TextField}
-                    type="text"
+                    type="number"
                     label="Precio"
                     size="small"
                     variant="outlined"
@@ -316,9 +359,9 @@ export default function CreateProduct({ attributes, handleClose }) {
                   <Field
                     fullWidth
                     required
-                    name="budgetItem"
+                    name="partidaPresupuestal"
                     component={TextField}
-                    type="text"
+                    type="number"
                     label="Partida presupuestal"
                     size="small"
                     variant="outlined"
@@ -328,7 +371,7 @@ export default function CreateProduct({ attributes, handleClose }) {
                   <Field
                     fullWidth
                     required
-                    name="dateRec"
+                    name="createdAt"
                     component={TextField}
                     type="date"
                     label="Fecha rec."
@@ -343,7 +386,7 @@ export default function CreateProduct({ attributes, handleClose }) {
                   <Field
                     fullWidth
                     required
-                    name="line"
+                    name="linea"
                     component={TextField}
                     type="text"
                     label="Línea"
@@ -355,9 +398,9 @@ export default function CreateProduct({ attributes, handleClose }) {
                   <Field
                     fullWidth
                     required
-                    name="inventories"
+                    name="inventariables"
                     component={TextField}
-                    type="text"
+                    type="number"
                     label="Inventariables"
                     size="small"
                     variant="outlined"
@@ -367,7 +410,7 @@ export default function CreateProduct({ attributes, handleClose }) {
                   <Field
                     fullWidth
                     required
-                    name="register"
+                    name="registro"
                     component={TextField}
                     type="text"
                     label="Registro"
@@ -379,9 +422,9 @@ export default function CreateProduct({ attributes, handleClose }) {
                   <Field
                     fullWidth
                     required
-                    name="purchaseLevel"
+                    name="nivelCompra"
                     component={TextField}
-                    type="text"
+                    type="number"
                     label="Nivel compra"
                     size="small"
                     variant="outlined"
@@ -400,22 +443,34 @@ export default function CreateProduct({ attributes, handleClose }) {
                   />
                 </GridItem>
               </GridContainer>
+              <Grid className={classes.buttons} item style={{ marginTop: 16 }}>
+                {/* <Button
+                  type="button"
+                  variant="contained"
+                  onClick={reset}
+                  disabled={submitting || pristine}
+                >
+                  Limpiar
+                </Button> */}
+                <Button
+                  variant="contained"
+                  color="primary"
+                  type="submit"
+                  disabled={submitting || mutationLoading}
+                >
+                  Guardar
+                </Button>
+              </Grid>
             </Paper>
           </form>
         )}
       />
-      {/* <List>
-        <ListItem button>
-          <ListItemText primary="Phone ringtone" secondary="Titania" />
-        </ListItem>
-        <Divider />
-        <ListItem button>
-          <ListItemText
-            primary="Default notification ringtone"
-            secondary="Tethys"
-          />
-        </ListItem>
-      </List> */}
+      <Backdrop className={classes.backdrop} open={mutationLoading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
+      <Backdrop className={classes.backdrop} open={mutationData}>
+        <Alert severity="success">¡Operación exitosa!</Alert>
+      </Backdrop>
     </Dialog>
   );
 }

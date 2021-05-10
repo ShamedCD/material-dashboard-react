@@ -39,7 +39,7 @@ function processData(data) {
       item.tipoPresentacion,
       `$${item.precioArticulo}`,
       `${item.partidaPresupuestal}`,
-      "06/24/2000",
+      item.createdAt,
       `${item.inventariables}`,
       `${item.nivelCompra}`,
       item.linea,
