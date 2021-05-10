@@ -53,7 +53,7 @@ export default function Login({ setToken }) {
 
   function LoginUser({ card, password }) {
     const { loading, error, data } = useQuery(AccountQueries.loginAccount, {
-      // variables: { card: "123456789", password: "123456", address: "imss.gob7" },
+      // variables: { card: "12345678", password: "12345678", address: "imss.gob7" },
       variables: { card: card, password: password },
     });
 
@@ -83,7 +83,7 @@ export default function Login({ setToken }) {
     setShowAlert(true);
     setTryLog(false);
     window.location.reload();
-    return <p>Bienvenido!</p>;
+    return <p></p>;
   }
 
   const handleSubmit = async (e) => {

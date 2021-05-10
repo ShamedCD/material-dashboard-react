@@ -1,57 +1,16 @@
 import React, { useState } from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import Box from "@material-ui/core/Box";
+import { useQuery, useMutation } from "@apollo/client";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import Logo from "components/Logo/Logo";
 import Title from "components/Title/Title";
 import ComboBox from "components/Autocomplete/ComboBox";
-import Copyright from "components/Copyright/Copyright";
 import GridContainer from "components/Grid/GridContainer";
 import GridItem from "components/Grid/GridItem";
 import InventoryCard from "components/Card/InventoryCard";
 import { Button, TextField } from "@material-ui/core";
-import Selector from "components/Autocomplete/Selector";
-import SupplyList from "components/Inventory/SupplyList";
-
-// This will start empty
-const opts = [
-  {
-    id: 1,
-    name: "Jeringa",
-    code: "1994-1121-2021-2102",
-    label: "1994-1121-2021-2102: Jeringa",
-    image: "https://www.jeringasyagujas.com/72-large_default/jeringas-de-5-ml-con-aguja-g21-de-08-mm-x-40.jpg",
-  },
-  {
-    id: 2,
-    name: "Guantes de latex",
-    code: "1972-1121-2021-2103",
-    label: "1972-1121-2021-2103: Guantes de latex",
-    image: "https://images-na.ssl-images-amazon.com/images/I/51X6FbyYCKL._AC_SY450_PIbundle-100,TopRight,0,0_SH20_.jpg",
-  },
-  {
-    id: 3,
-    name: "Electrocardiograma",
-    code: "1974-1121-2021-2104",
-    label: "1974-1121-2021-2104: Electrocardiograma",
-    image: "https://st.depositphotos.com/1616496/2602/i/950/depositphotos_26025909-stock-photo-defibrillator.jpg",
-  },
-  {
-    id: 4,
-    name: "Cable de monitor de signos vitales",
-    code: "2008-1121-2021-2105",
-    label: "1974-1121-2021-2105: Cable de monitor de signos vitales",
-    image: "https://img.medicalexpo.es/images_me/photo-m2/76060-4057747.jpg",
-  },
-  {
-    id: 5,
-    name: "Paracetamol",
-    code: "1957-1121-2021-2106",
-    label: "1974-1121-2021-2106: Paracetamol",
-    image: "https://s1.eestatic.com/2016/03/19/actualidad/actualidad_110751227_129370730_1706x960.jpg",
-  },
-];
+import SupplyQueries from "queries/Supply.js";
+import Alert from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -69,10 +28,58 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+function processData(data) {
+  const cat = data?.searchSupplies?.items?.map((item) => {
+    return {
+      id: item.id,
+      name: item.name,
+      code: item.code,
+      label: `${item.code}: ${item.name}`,
+      // image: "https://www.jeringasyagujas.com/72-large_default/jeringas-de-5-ml-con-aguja-g21-de-08-mm-x-40.jpg",
+    };
+  });
+
+  return cat;
+}
+
 export default function RegisterNewEntry() {
   const classes = useStyles();
-  const [catgOpts, setCatgOpts] = useState(opts);
+  let [newQty, setNewQty] = useState(0);
+  let [catgOpts, setCatgOpts] = useState([]);
+  const [haveLastSearch, setHaveLastSearch] = useState(false);
+  const [itemSelected, setItemSelected] = useState({});
+  const [showError, setShowError] = useState(false);
 
+  const { data = { searchSupplies: [] }, refetch: refetchSupplies } = useQuery(
+    SupplyQueries.searchSupplies
+  );
+
+  const [
+    registerEntry,
+    { loading: mutationLoading, error: mutationError, data: mutationData },
+  ] = useMutation(SupplyQueries.updateSupply);
+
+  if (data?.searchSupplies?.items) {
+    catgOpts = processData(data);
+  }
+
+  async function registerNewEntry() {
+    if (newQty) {
+      setShowError(false);
+      try {
+        await registerEntry({
+          variables: { id: itemSelected.id, qty: newQty },
+        });
+        setNewQty(0);
+        // refetchUsers()
+        window.location.reload();
+      } catch (e) {
+        console.info(e.message);
+      }
+    } else {
+      setShowError(true);
+    }
+  }
   /**
    * Function in charge of updating the status changes for the
    * set of filters available in the selector.
@@ -80,8 +87,20 @@ export default function RegisterNewEntry() {
    * @param {string} filter The value to be searched.
    */
   function updateSuppliesOptions(e, filter) {
-    // Actiualizar componentes de supplies
-    console.log("Cambio filtro");
+    e && e.preventDefault();
+    setShowError(false);
+    const filters = {
+      take: 10,
+    };
+
+    if (e.target.id === "name-searcher") {
+      filters.name = filter;
+    } else if (e.target.id === "name-searcher") {
+      filters.code = filter;
+    }
+
+    refetchSupplies(filters);
+    setCatgOpts(processData(data));
   }
 
   /**
@@ -90,12 +109,13 @@ export default function RegisterNewEntry() {
    */
   function findSupply(e) {
     e && e.preventDefault();
+    setShowError(false);
 
     const { optionIndex } = e.target.dataset;
     const item = catgOpts[optionIndex];
 
-    // setCatgOpts([item]);
-    // setHaveLastSearch(true);
+    setItemSelected(item);
+    setHaveLastSearch(true);
   }
 
   const RequestButton = (
@@ -103,15 +123,24 @@ export default function RegisterNewEntry() {
       id="outlined-number"
       label="Cantidad"
       type="number"
+      inputRef={newQty}
       InputLabelProps={{
         shrink: true,
       }}
       variant="outlined"
+      onChange={(event) => {
+        newQty = event.target.value;
+      }}
     />
   );
 
   const AddButton = (
-    <Button variant="outlined" size="small" color="primary">
+    <Button
+      variant="outlined"
+      size="small"
+      color="primary"
+      onClick={registerNewEntry}
+    >
       Agregar
     </Button>
   );
@@ -168,22 +197,36 @@ export default function RegisterNewEntry() {
             {/* </GridItem> */}
           </GridContainer>
         </div>
-        <GridItem xs={12} sm={12} md={12}>
-          <InventoryCard
-            attribute={{
-              title: "Paracetamol",
-              body_device: "",
-              body_model: "NS",
-              body_code: "code-foo",
-              image:
-                "https://s1.eestatic.com/2016/03/19/actualidad/actualidad_110751227_129370730_1706x960.jpg",
-            }}
-            param={{
-              request_button: () => RequestButton,
-              add_button: () => AddButton,
-            }}
-          />
-        </GridItem>
+        {haveLastSearch && (
+          <GridItem xs={12} sm={12} md={12}>
+            <InventoryCard
+              attribute={{
+                title: itemSelected.name,
+                body_device: "",
+                body_model: "",
+                body_code: itemSelected.code,
+                // image:
+                //   "https://s1.eestatic.com/2016/03/19/actualidad/actualidad_110751227_129370730_1706x960.jpg",
+              }}
+              param={{
+                request_button: () => RequestButton,
+                add_button: () => AddButton,
+              }}
+            />
+          </GridItem>
+        )}
+        {showError && (
+          <Alert severity="error">
+            Debe ingresar una cantidad mayor a 0 unidades
+          </Alert>
+        )}
+        {mutationLoading && <Alert severity="info">Cargando...</Alert>}
+        {mutationError && (
+          <Alert severity="error">
+            Error: Intente de nuevo mas tarde o contacte al administrador.
+          </Alert>
+        )}
+        {mutationData && <Alert severity="success">¡Operación exitosa!.</Alert>}
       </div>
     </Container>
   );

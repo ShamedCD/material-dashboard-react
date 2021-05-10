@@ -43,36 +43,55 @@ export default {
     }
   `,
   updateSupply: gql`
-    mutation UpdateSupplyNumbers($id: Number!, $qty: Number?, $cpm: Number?) {
-      updateSupply(id: $id, qty: $qty, cpm: $cpm)
+    mutation UpdateSupplyNumbers($id: Float!, $qty: Float, $cpm: Float) {
+      updateSupply(input: { id: $id, qty: $qty, cpm: $cpm })
     }
   `,
   activateSupply: gql`
-    mutation ActivateSupply($id: Number!) {
+    mutation ActivateSupply($id: ID!) {
       activateSupply(id: $id)
     }
   `,
   deactivateSupply: gql`
-    mutation ActivateSupply($id: Number!) {
+    mutation ActivateSupply($id: ID!) {
       deactivateSupply(id: $id)
     }
   `,
   searchSupplies: gql`
-    query SearchSupplies($take: Number?, $skip: Number?, $code: String?, $name: String?) {
+    query SearchSupplies(
+      $take: Float
+      $skip: Float
+      $code: String
+      $name: String
+    ) {
       searchSupplies(take: $take, skip: $skip, code: $code, name: $name) {
-        items: {
+        items {
           id
           name
           code
           label
-        },
+        }
         count
       }
-    }`,
+    }
+  `,
+  // searchSupplies: gql`
+  //   query SearchSupplies {
+  //     searchSupplies {
+  //       items {
+  //         id
+  //         name
+  //         code
+  //         label
+  //       }
+  //       count
+  //     }
+  //   }
+  // `,
   fetchSupplies: gql`
-    query FetchSupplies($take: Number?, $skip: Number?, $status: String?) {
+    query FetchSupplies($take: Float, $skip: Float, $status: String) {
       fetchSupplies(take: $take, skip: $skip, status: $status) {
-        items: {
+        items {
           gpo
           gen
           esp
@@ -82,7 +101,6 @@ export default {
           descripcion
           status
           qty
-          cpm
           unidadPresentacion
           cantidadPresentacion
           tipoPresentacion
@@ -92,14 +110,42 @@ export default {
           nivelCompra
           linea
           registro
-          createdAt
-        },
+        }
         count
       }
     }
   `,
+  // fetchSupplies: gql`
+  //   query FetchSupplies($take: Float, $skip: Float, $status: String) {
+  //     fetchSupplies(take: $take, skip: $skip, status: $status) {
+  //       items {
+  //         gpo
+  //         gen
+  //         esp
+  //         dif
+  //         var
+  //         cbi
+  //         descripcion
+  //         status
+  //         qty
+  //         cpm
+  //         unidadPresentacion
+  //         cantidadPresentacion
+  //         tipoPresentacion
+  //         precioArticulo
+  //         partidaPresupuestal
+  //         inventariables
+  //         nivelCompra
+  //         linea
+  //         registro
+  //         createdAt
+  //       }
+  //       count
+  //     }
+  //   }
+  // `,
   getSupply: gql`
-    query GetSupply($id: Number!) {
+    query GetSupply($id: ID!) {
       getSupply(id: $id) {
         gpo
         gen
