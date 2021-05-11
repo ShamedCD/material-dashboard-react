@@ -1,16 +1,95 @@
 import { gql } from "@apollo/client/core";
 
 export default {
-  createSupplyOrder: gql`
-    mutation createSupplyOrder()
+  createVale: gql`
+    mutation CreateVale(
+      $idService: Number!
+      $folio: String!
+      $type: String!
+      $requestedBy: String!
+      $requestedAt: Date!
+      $items: [CreateSupplySubCommand!]
+    ) {
+      createSupplyOrder(
+        idService: $idService
+        folio: $folio
+        type: $type
+        requestedBy: $requestedBy
+        requestedAt: $requestedAt
+        items: $items
+      )
+    }
   `,
-  updateSupplyOrder: gql`
-    mutation updateSupplyOrder()
+  deliverVale: gql`
+    mutation DeliverVale(
+      $id: ID!
+      $deliveredAt: Date!
+      $deliveredBy: String!
+      $items: [DeliverSupplySubCommand!]
+    ) {
+      deliverSupplyOrder(
+        id: $id
+        deliveredAt: $deliveredAt
+        deliveredBy: $deliveredBy
+        items: $items
+      )
+    }
   `,
-  deliverSupplyOrder: gql`
-    mutation deliverSupplyOrder()
+  fetchVales: gql`
+    query FetchVales(
+      $take: Float
+      $skip: Float
+      $status: String
+      $idService: Number
+      $type: String
+    ) {
+      fetchSupplyOrders(
+        take: $take
+        skip: $skip
+        status: $status
+        idService: $idService
+        type: $type
+      ) {
+        items {
+          id
+          idService
+          folio
+          type
+          nivelAtencion
+          nivelSuministro
+          grupoSuministro
+          status
+          requestedAt
+          requestedBy
+          deliveredAt
+          deliveredBy
+        }
+        count
+      }
+    }
   `,
-  fetchSupplyOrders: gql`
-    query fetchSupplyOrders()
+  getVale: gql`
+    query GetVale($id: Number) {
+      getSupplyOrder(id: $id) {
+        id
+        idService
+        folio
+        type
+        nivelAtencion
+        nivelSuministro
+        grupoSuministro
+        status
+        requestedAt
+        requestedBy
+        deliveredAt
+        deliveredBy
+        items {
+          id
+          idSupply
+          requestedQty
+          deliveredQty
+        }
+      }
+    }
   `,
 };
