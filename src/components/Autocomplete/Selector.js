@@ -15,16 +15,17 @@ const useStyles = makeStyles((theme) => ({
 export default function Selector({ attributes, behaviour, callback }) {
   const classes = useStyles();
   const { id, label } = attributes;
-  const { key, defaultValue, options } = behaviour;
+  const { key, defaultValue, options, props } = behaviour;
   const [state, setState] = useState(defaultValue);
 
-  const handleChange = (event) => {
+  const handleChange = (event, child) => {
     const name = event.target.name;
     setState({
       id: id,
       [name]: event.target.value,
     });
-    callback && callback(event.target);
+
+    callback && callback(event.target, child);
   };
 
   return (
@@ -32,6 +33,7 @@ export default function Selector({ attributes, behaviour, callback }) {
       <InputLabel htmlFor={"selector-" + id}>{label}</InputLabel>
       <Select
         native
+        {...props}
         value={state[key]}
         onChange={handleChange}
         label={label}

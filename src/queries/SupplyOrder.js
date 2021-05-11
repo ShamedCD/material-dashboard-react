@@ -3,20 +3,28 @@ import { gql } from "@apollo/client/core";
 export default {
   createVale: gql`
     mutation CreateVale(
-      $idService: Number!
+      $idService: Float!
       $folio: String!
       $type: String!
+      $nivelSuministro: String!
+      $grupoSuministro: String!
+      $nivelAtencion: String!
       $requestedBy: String!
-      $requestedAt: Date!
-      $items: [CreateSupplySubCommand!]
+      $requestedAt: DateTime!
+      $items: [CreateSupplySubCommand!]!
     ) {
       createSupplyOrder(
-        idService: $idService
-        folio: $folio
-        type: $type
-        requestedBy: $requestedBy
-        requestedAt: $requestedAt
-        items: $items
+        input: {
+          idService: $idService
+          folio: $folio
+          type: $type
+          nivelSuministro: $nivelSuministro
+          grupoSuministro: $grupoSuministro
+          nivelAtencion: $nivelAtencion
+          requestedBy: $requestedBy
+          requestedAt: $requestedAt
+          items: $items
+        }
       )
     }
   `,
@@ -40,7 +48,7 @@ export default {
       $take: Float
       $skip: Float
       $status: String
-      $idService: Number
+      $idService: Float
       $type: String
     ) {
       fetchSupplyOrders(
@@ -69,7 +77,7 @@ export default {
     }
   `,
   getVale: gql`
-    query GetVale($id: Number) {
+    query GetVale($id: Float!) {
       getSupplyOrder(id: $id) {
         id
         idService

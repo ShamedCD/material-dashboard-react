@@ -44,7 +44,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function NewRequestPreview({ attributes, dataset }) {
+export default function NewMemorandumPreview({ attributes, dataset }) {
   const classes = useStyles();
 
   const { title, subtitle, footer: Footer } = attributes;
@@ -71,31 +71,20 @@ export default function NewRequestPreview({ attributes, dataset }) {
       <div id="req-preview-body" className={classes.body}>
         <GridContainer>
           <GridItem xs={12} sm={6} md={6}>
-            <p>Nivel de suministro: {dataBody.supplyLevel}</p>
-            <p>Grupo de suministro: {dataBody.supplyGroup}</p>
-            <p>Nivel de atención: {dataBody.supplyAttention}</p>
-            <p>Tipo de solicitud: {dataBody.reqTypeVoucher}</p>
+            <p>Folio: {dataBody.folio}</p>
+            <p>Fecha de solicitud: {dataBody.createdAt}</p>
           </GridItem>
           <GridItem xs={12} sm={6} md={6}>
-            <p>Folio: {dataBody.folio}</p>
             <p>Delegacion: {dataBody.delegacion}</p>
             <p>Unidad Medica: {dataBody.unidadMedica}</p>
-            <p>Servicio: {dataBody.serviceUnit}</p>
-            <p>Fecha de suministro: {dataBody.createdAt}</p>
+          </GridItem>
+          <GridItem xs={12} sm={12} md={12}>
+            <p>Asunto: {dataBody.asunto}</p>
           </GridItem>
           <GridItem xs={12} sm={12} md={12}>
             <Table
               tableHeaderColor="success"
-              tableHead={[
-                "Clave",
-                "Nombre",
-                "CPM",
-                "PRES",
-                "DOT",
-                "UNIDAD",
-                "PRECIO",
-                "IMPORTE",
-              ]}
+              tableHead={["Clave", "Nombre", "CPM", "CANTIDAD"]}
               tableData={items}
             />
           </GridItem>

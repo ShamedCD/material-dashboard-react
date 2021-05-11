@@ -6,15 +6,17 @@ export default {
       $folio: String!
       $asunto: String!
       $requestedBy: String!
-      $requestedAt: Date!
-      $items: [CreatePurchaseSubCommand!]
+      $requestedAt: DateTime!
+      $items: [CreatePurchaseSubCommand!]!
     ) {
       createPurchaseOrder(
-        folio: $folio
-        asunto: $asunto
-        requestedBy: $requestedBy
-        requestedAt: $requestedAt
-        items: $items
+        input: {
+          folio: $folio
+          asunto: $asunto
+          requestedBy: $requestedBy
+          requestedAt: $requestedAt
+          items: $items
+        }
       )
     }
   `,
@@ -49,8 +51,8 @@ export default {
     }
   `,
   getMemorandum: gql`
-    query GetMemorandum($id: Number) {
-      getPurchaseOrder(id: 1) {
+    query GetMemorandum($id: Float!) {
+      getPurchaseOrder(id: $id) {
         id
         folio
         asunto

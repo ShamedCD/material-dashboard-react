@@ -43,7 +43,14 @@ const useStyles = makeStyles(styles);
 
 export default function SupplyList({ attributes }) {
   const classes = useStyles();
-  const { title, columns, rows, ActionComponent, itemsFound } = attributes;
+  const {
+    title,
+    columns,
+    rows,
+    ActionComponent,
+    itemsFound,
+    Pagination,
+  } = attributes;
 
   return (
     <GridContainer>
@@ -65,6 +72,7 @@ export default function SupplyList({ attributes }) {
               tableHead={columns}
               tableData={rows}
             />
+            {Pagination && <Pagination />}
           </CardBody>
         </Card>
       </GridItem>

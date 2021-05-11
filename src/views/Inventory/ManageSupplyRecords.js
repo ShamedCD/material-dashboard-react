@@ -3,7 +3,7 @@ import { useQuery } from "@apollo/client";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import { Button, Slide } from "@material-ui/core";
+import { Button, Slide, TablePagination } from "@material-ui/core";
 import SupplyList from "components/Inventory/SupplyList";
 import CreateProduct from "components/Inventory/CreateProduct";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
@@ -53,11 +53,19 @@ function processData(data) {
 export default function ManageSupplyRecords() {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
+  const [page, setPage] = useState(0);
+  let [rowsPerPage, setRowsPerPage] = useState(10);
   let [itemsFound] = useState(0);
+  let [stock] = useState([]);
 
-  const { data = { fetchSupplies: [] } } = useQuery(
+  const { data = { fetchSupplies: [] }, refetch: refetchSupplies } = useQuery(
     SupplyQueries.fetchSupplies
   );
+
+  if (data?.fetchSupplies?.items) {
+    stock = processData(data);
+    itemsFound = data?.fetchSupplies?.count ?? 0;
+  }
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -67,15 +75,23 @@ export default function ManageSupplyRecords() {
     setOpen(false);
   };
 
-  function getRows() {
-    let stock = [];
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+    refetchSupplies({
+      take: rowsPerPage,
+      skip: parseInt(rowsPerPage) * parseInt(newPage),
+    });
+  };
 
-    if (data?.fetchSupplies?.items) {
-      stock = processData(data);
-      itemsFound = data?.fetchSupplies?.count ?? 0;
-    }
-    return stock;
-  }
+  const handleChangeRowsPerPage = (event) => {
+    const rpp = parseInt(event.target.value, 10);
+    setRowsPerPage(rpp);
+    setPage(0);
+    refetchSupplies({
+      take: rpp,
+      skip: parseInt(rpp) * parseInt(page),
+    });
+  };
 
   const AddButton = (
     <Button
@@ -111,8 +127,20 @@ export default function ManageSupplyRecords() {
               "Registro",
               "Minimo p/alerta",
             ],
-            rows: getRows(),
+            rows: stock,
             itemsFound,
+            // eslint-disable-next-line react/display-name
+            Pagination: () => (
+              <TablePagination
+                labelRowsPerPage="Filas por página"
+                component="div"
+                count={itemsFound}
+                page={page}
+                onChangePage={handleChangePage}
+                rowsPerPage={rowsPerPage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+              />
+            ),
           }}
         />
       </div>

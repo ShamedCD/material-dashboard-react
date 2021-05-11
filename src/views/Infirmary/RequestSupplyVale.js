@@ -1,8 +1,18 @@
 import React, { useState } from "react";
+import { useQuery, useMutation } from "@apollo/client";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import { Button, Paper, Snackbar, TextField } from "@material-ui/core";
+import {
+  Button,
+  Paper,
+  Snackbar,
+  TextField,
+  Divider,
+  MenuItem,
+  Backdrop,
+  CircularProgress,
+} from "@material-ui/core";
 import Table from "components/Table/Table.js";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import Title from "components/Title/Title";
@@ -14,50 +24,10 @@ import SpringModal from "components/Modal/SpringModal";
 import NewRequestPreview from "components/Infirmary/NewRequestPreview";
 import MuiAlert from "@material-ui/lab/Alert";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
-
-// This will start empty
-const opts = [
-  {
-    id: 1,
-    name: "Jeringa",
-    code: "1994-1121-2021-2102",
-    cpm: "21",
-    label: "1994-1121-2021-2102: Jeringa",
-    image: "https://www.jeringasyagujas.com/72-large_default/jeringas-de-5-ml-con-aguja-g21-de-08-mm-x-40.jpg",
-  },
-  {
-    id: 2,
-    name: "Guantes de latex",
-    code: "1972-1121-2021-2103",
-    cpm: "12",
-    label: "1972-1121-2021-2103: Guantes de latex",
-    image: "https://images-na.ssl-images-amazon.com/images/I/51X6FbyYCKL._AC_SY450_PIbundle-100,TopRight,0,0_SH20_.jpg",
-  },
-  {
-    id: 3,
-    name: "Electrocardiograma",
-    code: "1974-1121-2021-2104",
-    cpm: "54",
-    label: "1974-1121-2021-2104: Electrocardiograma",
-    image: "https://st.depositphotos.com/1616496/2602/i/950/depositphotos_26025909-stock-photo-defibrillator.jpg",
-  },
-  {
-    id: 4,
-    name: "Cable de monitor de signos vitales",
-    code: "2008-1121-2021-2105",
-    cpm: "65",
-    label: "1974-1121-2021-2105: Cable de monitor de signos vitales",
-    image: "https://img.medicalexpo.es/images_me/photo-m2/76060-4057747.jpg",
-  },
-  {
-    id: 5,
-    name: "Paracetamol",
-    code: "1957-1121-2021-2106",
-    cpm: "76",
-    label: "1974-1121-2021-2106: Paracetamol",
-    image: "https://s1.eestatic.com/2016/03/19/actualidad/actualidad_110751227_129370730_1706x960.jpg",
-  },
-];
+import SupplyQueries from "queries/Supply.js";
+import CatalogueQueries from "queries/Catalogue.js";
+import SupplyOrderQueries from "queries/SupplyOrder.js";
+import useToken from "components/App/useToken";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -95,28 +65,99 @@ const useStyles = makeStyles((theme) => ({
       margin: theme.spacing(1),
     },
   },
+  input: {
+    margin: theme.spacing(0),
+    marginTop: "10px",
+  },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: "#fff",
+  },
 }));
 
-export default function RequestSupply() {
+function processData(data) {
+  const cat = data?.searchSupplies?.items?.map((item) => {
+    return {
+      id: item.id,
+      name: item.name,
+      code: item.code,
+      // cpm: item.cpm,
+      label: `${item.code}: ${item.name}`,
+      // image: "https://www.jeringasyagujas.com/72-large_default/jeringas-de-5-ml-con-aguja-g21-de-08-mm-x-40.jpg",
+    };
+  });
+
+  return cat;
+}
+
+export default function RequestSupplyVale() {
   const classes = useStyles();
-  const [catgOpts, setCatgOpts] = useState(opts);
-  const [requestData] = useState({ items: [] });
+  const { token } = useToken();
+  let [catgOpts, setCatgOpts] = useState([]);
+  const [requestData] = useState({
+    createdAt: new Date().toLocaleDateString(),
+    delegacion: "24 QROO",
+    unidadMedica: "HGOP#07",
+    items: [],
+  });
   const [rowTable] = useState([]);
   const [rowTablePreview] = useState([]);
-  const [isVale, setIsVale] = useState(false);
   const [newRow, setNewRow] = useState({});
   const [open, setOpen] = useState(false);
   const [openAlert, setOpenAlert] = useState(false);
+  const [alertMsg, setAlertMsg] = useState("");
+
+  const { data = { searchSupplies: [] }, refetch: refetchSupplies } = useQuery(
+    SupplyQueries.searchSupplies
+  );
+
+  const [
+    registerEntry,
+    { loading: mutationLoading, error: mutationError, data: mutationData },
+  ] = useMutation(SupplyOrderQueries.createVale);
+
+  const { data: catg } = useQuery(CatalogueQueries.catServices);
+
+  if (data?.searchSupplies?.items) {
+    catgOpts = processData(data);
+  }
+
+  async function persisRequest() {
+    try {
+      await registerEntry({
+        variables: {
+          idService: parseInt(requestData.serviceUnitKey),
+          folio: requestData.folio,
+          type: requestData.reqTypeVoucher,
+          nivelSuministro: requestData.supplyLevel,
+          grupoSuministro: requestData.supplyGroup,
+          nivelAtencion: requestData.supplyAttention,
+          requestedBy: token,
+          requestedAt: requestData.createdAt,
+          items: requestData.items.map((item) => {
+            return {
+              idSupply: item[0],
+              requestedQty: parseInt(item[4]),
+            };
+          }),
+        },
+      });
+      window.location.reload();
+    } catch (e) {
+      setOpen(false);
+      console.info(e.message);
+      window.location.reload();
+    }
+  }
 
   const Content = (
     <NewRequestPreview
       attributes={{
-        title: "CONFIRMAR NUEVA SOLICITUD",
+        title: "CONFIRMAR NUEVA SOLICITUD DE VALE",
         footer: () => RequestButtons,
       }}
       dataset={{
-        reqType: requestData.reqType,
-        reqTypeVoucher: requestData.reqTypeVoucher,
+        dataBody: requestData,
         items: rowTablePreview,
       }}
     />
@@ -127,15 +168,20 @@ export default function RequestSupply() {
       <Button
         variant="contained"
         size="small"
-        color="primary" /*onClick={handleClose}*/
-        // onClick={handleClickOpen}
+        color="primary"
+        onClick={persisRequest}
+        disabled={mutationLoading}
       >
         Guardar y generar vale
       </Button>
       <Button
         variant="contained"
         size="small"
-        color="secondary" /*onClick={handleClose}*/
+        color="secondary"
+        onClick={(e) => {
+          e && e.preventDefault();
+          setOpen(false);
+        }}
       >
         Cancelar
       </Button>
@@ -157,26 +203,33 @@ export default function RequestSupply() {
    * @param {string} filter The value to be searched.
    */
   function updateSuppliesOptions(e, filter) {
-    // Actiualizar componentes de supplies
-    console.log("Cambio filtro");
-  }
-
-  /**
-   * Search for an specific item by key.
-   * @param {Event} e The event source of the callback.
-   */
-  function findSupply(e) {
     e && e.preventDefault();
+    const filters = {
+      take: 10,
+      name: filter,
+    };
 
-    const { optionIndex } = e.target.dataset;
-    const item = catgOpts[optionIndex];
-
-    // setCatgOpts([item]);
+    refetchSupplies(filters);
+    setCatgOpts(processData(data));
   }
 
   const handleClickOpen = () => {
-    // Validar que exista al menos una fila en la tabla
-    setOpen(true);
+    if (
+      rowTablePreview.length > 0 &&
+      requestData.serviceUnit &&
+      requestData.reqTypeVoucher &&
+      requestData.supplyLevel &&
+      requestData.supplyGroup &&
+      requestData.supplyAttention &&
+      requestData.folio
+    ) {
+      setOpen(true);
+    } else {
+      setAlertMsg(
+        "Debes llenar todos los campos y agregar al menos un articulo para generar la orden."
+      );
+      setOpenAlert(true);
+    }
   };
 
   const cleanNewRowFields = () => {
@@ -185,11 +238,9 @@ export default function RequestSupply() {
 
   const handleClickDelete = (event) => {
     event.preventDefault();
-    // alert(event.target);
     const key = event.target.closest("button").id;
-    // console.log(event.target.closest("button").id);
+
     requestData.items.find((item, index) => {
-      console.log(requestData.items);
       if (item && item.includes(key)) {
         requestData.items.splice(index, 1);
       }
@@ -198,6 +249,7 @@ export default function RequestSupply() {
 
   const handleClickAdd = () => {
     if (!newRow.id || !newRow.itemQty || newRow.itemQty < 1) {
+      setAlertMsg("¡Error! Debe especificar nombre y cantidad del articulo.");
       setOpenAlert(true);
     } else {
       // Para alamacenar en base de datos
@@ -251,44 +303,10 @@ export default function RequestSupply() {
     <Container component="main" maxWidth="xl">
       <CssBaseline />
       <div className={classes.paper}>
-        <Title text="Generar Nueva Solicitud" />
+        <Title text="Generar Nueva Orden de Insumo" />
         <Paper>
           <div id="searcher" className={classes.root}>
             <GridContainer>
-              <GridItem xs={12} sm={4} md={4}>
-                <Selector
-                  attributes={{
-                    id: "request-type",
-                    label: "Tipo de solicitud",
-                  }}
-                  behaviour={{
-                    key: "reqType",
-                    defaultValue: {
-                      reqType: "",
-                      id: "request-type",
-                    },
-                    options: [
-                      <option key="" aria-label="None" value="" />,
-                      <option key="vale" value="vale">
-                        Vale
-                      </option>,
-                      <option key="memorandum" value="memorandum">
-                        Memorándum de compra
-                      </option>,
-                    ],
-                  }}
-                  callback={(target) => {
-                    if (target.value == "vale") {
-                      setIsVale(true);
-                    } else {
-                      requestData.reqTypeVoucher = "";
-                      setIsVale(false);
-                    }
-
-                    requestData.reqType = target.value;
-                  }}
-                />
-              </GridItem>
               <GridItem xs={12} sm={6} md={4}>
                 <Selector
                   attributes={{
@@ -302,50 +320,109 @@ export default function RequestSupply() {
                       id: "service-unit",
                     },
                     options: [
-                      <option key="" aria-label="None" value="" />,
-                      <option key="ucin" value="ucin">
-                        UCIN
-                      </option>,
-                      <option key="ucia" value="ucia">
-                        Terapia intensica Adultos
-                      </option>,
-                    ],
+                      <MenuItem key="" value="">
+                        <em>None</em>
+                      </MenuItem>,
+                    ].concat(
+                      catg?.catServices.map((service) => (
+                        <MenuItem key={service.id} value={service.name}>
+                          {service.name}
+                        </MenuItem>
+                      ))
+                    ),
+                    props: { native: false },
+                  }}
+                  callback={(target, child) => {
+                    requestData.serviceUnit = target.value;
+                    requestData.serviceUnitKey = child.key;
                   }}
                 />
               </GridItem>
-              {/* // Aparece unicamente cuando el tipo de solicitud es vale */}
-              {isVale && (
-                <GridItem xs={12} sm={6} md={4}>
-                  <Selector
-                    attributes={{
+              <GridItem xs={12} sm={6} md={4}>
+                <Selector
+                  attributes={{
+                    id: "reqType-voucher",
+                    label: "Tipo de solicitud en vale",
+                  }}
+                  behaviour={{
+                    key: "type",
+                    defaultValue: {
+                      type: "",
                       id: "reqType-voucher",
-                      label: "Tipo de solicitud en vale",
-                    }}
-                    behaviour={{
-                      key: "type",
-                      defaultValue: {
-                        type: "",
-                        id: "reqType-voucher",
-                      },
-                      options: [
-                        <option key="" aria-label="None" value="" />,
-                        <option key="complementary" value="complementary">
-                          Complementario
-                        </option>,
-                        <option key="ordinary" value="ordinary">
-                          Ordinario
-                        </option>,
-                        <option key="extraodinary" value="extraodinary">
-                          Extraordinario
-                        </option>,
-                      ],
-                    }}
-                    callback={(target) => {
-                      requestData.reqTypeVoucher = target.value;
-                    }}
-                  />
-                </GridItem>
-              )}
+                    },
+                    options: [
+                      <option key="" aria-label="None" value="" />,
+                      <option key="complementary" value="complementario">
+                        Complementario
+                      </option>,
+                      <option key="ordinary" value="ordinario">
+                        Ordinario
+                      </option>,
+                      <option key="extraodinary" value="extraordinario">
+                        Extraordinario
+                      </option>,
+                    ],
+                  }}
+                  callback={(target) => {
+                    requestData.reqTypeVoucher = target.value;
+                  }}
+                />
+              </GridItem>
+              <GridItem xs={12} sm={4} md={4}>
+                <TextField
+                  className={classes.input}
+                  id="folio"
+                  label="Folio"
+                  type="text"
+                  fullWidth
+                  variant="outlined"
+                  onChange={(event) => {
+                    requestData.folio = event.target.value;
+                  }}
+                />
+              </GridItem>
+              <GridItem xs={12} sm={4} md={4}>
+                <TextField
+                  className={classes.input}
+                  id="supply-level"
+                  label="Nivel de Suministro"
+                  type="text"
+                  fullWidth
+                  variant="outlined"
+                  onChange={(event) => {
+                    requestData.supplyLevel = event.target.value;
+                  }}
+                />
+              </GridItem>
+              <GridItem xs={12} sm={4} md={4}>
+                <TextField
+                  className={classes.input}
+                  id="group-supply"
+                  label="Grupo de Suministro"
+                  type="text"
+                  fullWidth
+                  variant="outlined"
+                  onChange={(event) => {
+                    requestData.supplyGroup = event.target.value;
+                  }}
+                />
+              </GridItem>
+              <GridItem xs={12} sm={4} md={4}>
+                <TextField
+                  className={classes.input}
+                  id="att-level"
+                  label="Nivel de Atención"
+                  type="text"
+                  fullWidth
+                  variant="outlined"
+                  onChange={(event) => {
+                    requestData.supplyAttention = event.target.value;
+                  }}
+                />
+              </GridItem>
+              <GridItem xs={12} sm={12} md={12}>
+                <Divider variant="middle" />
+              </GridItem>
               <GridItem xs={12} sm={8} md={8}>
                 <ComboBox
                   attributes={{
@@ -375,17 +452,6 @@ export default function RequestSupply() {
                 />
               </GridItem>
               <GridItem xs={10} sm={3} md={3}>
-                {/* <CustomInput
-                  labelText="Cantidad"
-                  id="item-qty"
-                  formControlProps={{
-                    fullWidth: true,
-                  }}
-                  inputProps={{
-                    type: "number",
-                    variant: "outlined",
-                  }}
-                /> */}
                 <TextField
                   id="item-qty"
                   label="Cantidad"
@@ -412,8 +478,6 @@ export default function RequestSupply() {
               <GridItem xs={12} sm={12} md={12}>
                 <Table
                   tableHeaderColor="success"
-                  // tableHead={columns}
-                  // tableData={rows}
                   tableHead={[
                     "Artículo",
                     "Clave",
@@ -426,11 +490,10 @@ export default function RequestSupply() {
               </GridItem>
               <GridItem xs={12} sm={12} md={12}>
                 <div className={classes.buttons}>
-                  {/* Agregar validador que se aseguré que los campos minimos esten llenos */}
                   <Button
                     variant="contained"
                     size="small"
-                    color="primary" /*onClick={handleClose}*/
+                    color="primary"
                     onClick={handleClickOpen}
                   >
                     Generar Solicitud
@@ -441,7 +504,7 @@ export default function RequestSupply() {
                     color="secondary"
                     onClick={(e) => {
                       e.preventDefault();
-                      window.location.reload(false);
+                      window.location.reload();
                     }}
                   >
                     Cancelar
@@ -466,8 +529,19 @@ export default function RequestSupply() {
               onClose={handleCloseAlert}
             >
               <Alert onClose={handleCloseAlert} severity="error">
-                ¡Error! Debe especificar nombre y cantidad del articulo.
+                {alertMsg}
               </Alert>
+            </Snackbar>
+            <Snackbar open={mutationError} autoHideDuration={6000}>
+              <Alert severity="error">
+                ¡Ha ocurrido un error! Contacte al administrador.
+              </Alert>
+            </Snackbar>
+            <Backdrop className={classes.backdrop} open={mutationLoading}>
+              <CircularProgress color="inherit" />
+            </Backdrop>
+            <Snackbar autoHideDuration={6000} open={mutationData}>
+              <Alert severity="success">¡Operación exitosa!</Alert>
             </Snackbar>
           </div>
         </Paper>
