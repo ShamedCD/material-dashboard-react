@@ -12,4 +12,25 @@ export default {
       }
     }
   `,
+  topThreePurchases: gql`
+    query ChartTopThreePurchases($month: String!, $year: String!) {
+      topPurchases(month: $month, year: $year) {
+        labels
+        series {
+          meta
+          value
+        }
+      }
+    }
+  `,
+  suppliesByService: gql`
+    query PieSuppliesByService($idSupply: Number!) {
+      suppliesByService(idSupply: $idSupply) {
+        series {
+          meta
+          value
+        }
+      }
+    }
+  `,
 };

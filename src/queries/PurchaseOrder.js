@@ -3,7 +3,6 @@ import { gql } from "@apollo/client/core";
 export default {
   createMemorandum: gql`
     mutation CreateMemorandum(
-      $folio: String!
       $asunto: String!
       $requestedBy: String!
       $requestedAt: DateTime!
@@ -11,7 +10,6 @@ export default {
     ) {
       createPurchaseOrder(
         input: {
-          folio: $folio
           asunto: $asunto
           requestedBy: $requestedBy
           requestedAt: $requestedAt

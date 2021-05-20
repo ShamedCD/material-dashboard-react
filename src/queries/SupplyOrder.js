@@ -4,11 +4,7 @@ export default {
   createVale: gql`
     mutation CreateVale(
       $idService: Float!
-      $folio: String!
       $type: String!
-      $nivelSuministro: String!
-      $grupoSuministro: String!
-      $nivelAtencion: String!
       $requestedBy: String!
       $requestedAt: DateTime!
       $items: [CreateSupplySubCommand!]!
@@ -16,11 +12,7 @@ export default {
       createSupplyOrder(
         input: {
           idService: $idService
-          folio: $folio
           type: $type
-          nivelSuministro: $nivelSuministro
-          grupoSuministro: $grupoSuministro
-          nivelAtencion: $nivelAtencion
           requestedBy: $requestedBy
           requestedAt: $requestedAt
           items: $items
@@ -63,9 +55,6 @@ export default {
           idService
           folio
           type
-          nivelAtencion
-          nivelSuministro
-          grupoSuministro
           status
           requestedAt
           requestedBy
@@ -83,9 +72,6 @@ export default {
         idService
         folio
         type
-        nivelAtencion
-        nivelSuministro
-        grupoSuministro
         status
         requestedAt
         requestedBy
